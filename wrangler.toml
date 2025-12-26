@@ -1,4 +1,5 @@
-name = "miles-for-meals-api"
+# wrangler.toml
+name = 'milesformeals2026'
 main = "worker.js"
 compatibility_date = "2025-12-26"
 
