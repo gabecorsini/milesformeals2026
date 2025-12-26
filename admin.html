@@ -395,7 +395,8 @@
             document.getElementById('currentTraining').textContent = tracker.data.trainingMiles.toFixed(1);
             document.getElementById('currentRace').textContent = tracker.data.raceMiles.toFixed(1);
             document.getElementById('currentTotal').textContent = tracker.getTotalMiles().toFixed(1);
-            document.getElementById('currentTarget').textContent = (tracker.data.targetMiles || 1000).toLocaleString();
+            const targetMiles = Number.isFinite(tracker.data.targetMiles) ? tracker.data.targetMiles : 1000;
+            document.getElementById('currentTarget').textContent = targetMiles.toLocaleString();
             document.getElementById('currentRaised').textContent = '$' + tracker.getTotalDonations().toFixed(2);
             document.getElementById('currentUpdated').textContent = formatLastUpdated(tracker.data.lastUpdated);
 
@@ -403,7 +404,7 @@
             document.getElementById('trainingMiles').value = tracker.data.trainingMiles;
             document.getElementById('raceMiles').value = tracker.data.raceMiles;
             document.getElementById('additionalDonations').value = tracker.data.additionalDonations;
-            document.getElementById('targetMiles').value = tracker.data.targetMiles || 1000;
+            document.getElementById('targetMiles').value = Number.isFinite(tracker.data.targetMiles) ? tracker.data.targetMiles : 1000;
         }
 
         // Handle form submission

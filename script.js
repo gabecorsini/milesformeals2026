@@ -20,11 +20,12 @@ class MilesTracker {
             if (!response.ok) throw new Error('Failed to load data');
             
             const data = await response.json();
+            const parsedTarget = parseFloat(data.targetMiles);
             this.data = {
                 trainingMiles: parseFloat(data.trainingMiles) || 0,
                 raceMiles: parseFloat(data.raceMiles) || 0,
                 additionalDonations: parseFloat(data.additionalDonations) || 0,
-                targetMiles: parseFloat(data.targetMiles) || 1000,
+                targetMiles: Number.isFinite(parsedTarget) ? parsedTarget : 1000,
                 lastUpdated: data.lastUpdated || new Date().toISOString()
             };
             
@@ -114,7 +115,7 @@ class MilesTracker {
 
         // Update progress bar
         if (progressFillEl && progressPercentEl) {
-            const targetMiles = this.data.targetMiles || 1000;
+            const targetMiles = Number.isFinite(this.data.targetMiles) ? this.data.targetMiles : 1000;
             const progressPercent = targetMiles > 0 ? Math.min((totalMiles / targetMiles) * 100, 100) : 0;
             progressFillEl.style.width = progressPercent + '%';
             progressPercentEl.textContent = Math.round(progressPercent) + '%';

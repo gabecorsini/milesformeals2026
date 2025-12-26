@@ -32,6 +32,11 @@ export default {
           }), { headers: corsHeaders });
         }
 
+        // Backfill targetMiles if missing in existing KV data
+        if (typeof data.targetMiles === 'undefined') {
+          data.targetMiles = 1000;
+        }
+
         return new Response(JSON.stringify(data), { headers: corsHeaders });
       } catch (error) {
         return new Response(JSON.stringify({ error: 'Failed to retrieve data' }), {
@@ -58,7 +63,8 @@ export default {
         const trainingMiles = parseFloat(body.trainingMiles) || 0;
         const raceMiles = parseFloat(body.raceMiles) || 0;
         const additionalDonations = parseFloat(body.additionalDonations) || 0;
-        const targetMiles = Math.max(parseFloat(body.targetMiles) || 0, 0);
+        const parsedTarget = parseFloat(body.targetMiles);
+        const targetMiles = Number.isFinite(parsedTarget) ? Math.max(parsedTarget, 0) : 1000;
 
         if (trainingMiles < 0 || raceMiles < 0 || additionalDonations < 0 || targetMiles < 0) {
           return new Response(JSON.stringify({ error: 'Values cannot be negative' }), {
