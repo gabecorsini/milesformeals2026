@@ -340,6 +340,21 @@
 
             <div id="message" class="message"></div>
         </form>
+
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
+            <h3 style="color: #1e293b; margin-bottom: 1rem;">📋 Restore from Backup</h3>
+            <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1rem;">
+                Automatic daily backups are saved. Select a date to restore previous data.
+            </p>
+            <div class="form-group">
+                <label for="backupSelect">Available Backups:</label>
+                <select id="backupSelect" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                    <option value="">-- Loading backups --</option>
+                </select>
+            </div>
+            <button type="button" class="btn-update" onclick="restoreFromBackup()" style="width: 100%;">Restore Selected Backup</button>
+            <div id="restoreMessage" class="message" style="margin-top: 1rem;"></div>
+        </div>
     </div>
 
     <script src="script.js"></script>
@@ -405,6 +420,9 @@
             document.getElementById('raceMiles').value = tracker.data.raceMiles;
             document.getElementById('additionalDonations').value = tracker.data.additionalDonations;
             document.getElementById('targetMiles').value = Number.isFinite(tracker.data.targetMiles) ? tracker.data.targetMiles : 1000;
+
+            // Load available backups
+            await loadBackups();
         }
 
         // Handle form submission
@@ -478,6 +496,77 @@
             const date = new Date(value);
             if (Number.isNaN(date.getTime())) return value;
             return date.toLocaleString(undefined, { hour12: true });
+        }
+
+        // Load and display available backups
+        async function loadBackups() {
+            try {
+                const response = await fetch('https://milesformeals2026.gabe-corsini.workers.dev/api/backups');
+                if (!response.ok) throw new Error('Failed to fetch backups');
+                
+                const result = await response.json();
+                const select = document.getElementById('backupSelect');
+                select.innerHTML = '';
+                
+                if (!result.backups || result.backups.length === 0) {
+                    select.innerHTML = '<option value="">No backups available yet</option>';
+                    return;
+                }
+                
+                result.backups.forEach(backup => {
+                    const option = document.createElement('option');
+                    const dateObj = new Date(backup.date);
+                    const dateStr = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                    const milesStr = backup.miles > 0 ? ` (${backup.miles.toFixed(1)} mi)` : '';
+                    option.value = backup.key;
+                    option.textContent = `${dateStr}${milesStr}`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading backups:', error);
+            }
+        }
+
+        async function restoreFromBackup() {
+            const backupKey = document.getElementById('backupSelect').value;
+            if (!backupKey) {
+                showRestoreMessage('Please select a backup', 'error');
+                return;
+            }
+
+            if (!confirm(`Restore backup from ${backupKey.replace('backup_', '')}?\n\nThis will replace current data.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('https://milesformeals2026.gabe-corsini.workers.dev/api/restore', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pin: currentPin,
+                        backupKey: backupKey
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to restore');
+                }
+
+                showRestoreMessage('✓ Data restored successfully!', 'success');
+                await loadCurrentData();
+            } catch (error) {
+                console.error('Restore error:', error);
+                showRestoreMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        function showRestoreMessage(text, type) {
+            const messageEl = document.getElementById('restoreMessage');
+            messageEl.textContent = text;
+            messageEl.classList.remove('success', 'error');
+            messageEl.classList.add(type);
         }
     </script>
 </body>
