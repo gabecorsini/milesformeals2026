@@ -6,7 +6,8 @@ class MilesTracker {
         this.data = {
             trainingMiles: 0,
             raceMiles: 0,
-            additionalDonations: 0
+            additionalDonations: 0,
+            lastUpdated: null
         };
         this.isLoading = false;
     }
@@ -21,7 +22,8 @@ class MilesTracker {
             this.data = {
                 trainingMiles: parseFloat(data.trainingMiles) || 0,
                 raceMiles: parseFloat(data.raceMiles) || 0,
-                additionalDonations: parseFloat(data.additionalDonations) || 0
+                additionalDonations: parseFloat(data.additionalDonations) || 0,
+                lastUpdated: data.lastUpdated || new Date().toISOString()
             };
             
             this.updateDisplay();

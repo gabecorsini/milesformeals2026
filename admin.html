@@ -239,6 +239,16 @@
             font-size: 0.95rem;
         }
 
+        .badge {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #075985;
+            padding: 0.25rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
         .current-data p {
             margin: 0.5rem 0;
             color: #64748b;
@@ -294,6 +304,7 @@
         </div>
 
         <div class="current-data">
+            <div class="badge">Last updated: <span id="currentUpdated">--</span></div>
             <p><strong>Current Training Miles:</strong> <span id="currentTraining">0</span></p>
             <p><strong>Current Race Miles:</strong> <span id="currentRace">0</span></p>
             <p><strong>Total Miles:</strong> <span id="currentTotal">0</span></p>
@@ -379,6 +390,7 @@
             document.getElementById('currentRace').textContent = tracker.data.raceMiles.toFixed(1);
             document.getElementById('currentTotal').textContent = tracker.getTotalMiles().toFixed(1);
             document.getElementById('currentRaised').textContent = '$' + tracker.getTotalDonations().toFixed(2);
+            document.getElementById('currentUpdated').textContent = formatLastUpdated(tracker.data.lastUpdated);
 
             // Pre-fill form with current values
             document.getElementById('trainingMiles').value = tracker.data.trainingMiles;
@@ -448,6 +460,13 @@
             messageEl.textContent = text;
             messageEl.classList.remove('success', 'error');
             messageEl.classList.add(type);
+        }
+
+        function formatLastUpdated(value) {
+            if (!value) return 'not yet set';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return value;
+            return date.toLocaleString(undefined, { hour12: true });
         }
     </script>
 </body>
