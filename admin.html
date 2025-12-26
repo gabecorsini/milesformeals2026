@@ -190,10 +190,18 @@
             text-decoration: none;
             display: inline-block;
             text-align: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .btn-back:hover {
             background-color: #059669;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
         }
 
         .back-button {
@@ -284,9 +292,8 @@
             id="pinInput" 
             class="pin-input" 
             placeholder="Enter PIN"
-            onkeypress="if(event.key==='Enter') verifyPin()"
         >
-        <button class="pin-button" onclick="verifyPin()">Unlock</button>
+        <button class="pin-button" id="pinButton">Unlock</button>
         <p class="pin-error" id="pinError">❌ Incorrect PIN. Try again.</p>
     </div>
 
@@ -341,6 +348,27 @@
             <div id="message" class="message"></div>
         </form>
 
+        <form id="addMilesForm" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
+            <h3 style="color: #1e293b; margin-bottom: 1rem;">➕ Quick Add Miles</h3>
+            <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem;">
+                Quickly add miles without editing absolute values. This increments your totals.
+            </p>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="addTrainingMiles">Add Training Miles:</label>
+                    <input type="number" id="addTrainingMiles" step="0.1" min="0" value="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="addRaceMiles">Add Race Miles:</label>
+                    <input type="number" id="addRaceMiles" step="0.1" min="0" value="0" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-update" id="addMilesBtn" style="width: 100%; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">➕ Add Miles</button>
+            <div id="addMessage" class="message" style="margin-top: 1rem;"></div>
+        </form>
+
         <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
             <h3 style="color: #1e293b; margin-bottom: 1rem;">📋 Restore from Backup</h3>
             <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1rem;">
@@ -352,7 +380,7 @@
                     <option value="">-- Loading backups --</option>
                 </select>
             </div>
-            <button type="button" class="btn-update" onclick="restoreFromBackup()" style="width: 100%;">Restore Selected Backup</button>
+            <button type="button" class="btn-update" id="restoreBtn" onclick="restoreFromBackup()" style="width: 100%; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">Restore Selected Backup</button>
             <div id="restoreMessage" class="message" style="margin-top: 1rem;"></div>
         </div>
     </div>
@@ -394,6 +422,8 @@
         // Allow Enter key to submit PIN
         document.addEventListener('DOMContentLoaded', () => {
             const pinInput = document.getElementById('pinInput');
+            const pinButton = document.getElementById('pinButton');
+            
             if (pinInput) {
                 pinInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
@@ -401,6 +431,10 @@
                     }
                 });
                 pinInput.focus();
+            }
+            
+            if (pinButton) {
+                pinButton.addEventListener('click', verifyPin);
             }
         });
 
@@ -462,26 +496,49 @@
             }
         });
 
-        async function clearAllData() {
-            if (!confirm('⚠️ WARNING: This will permanently clear all miles and donations data!\n\nAre you sure?')) {
-                return;
-            }
-            
-            if (!confirm('This action cannot be undone. Clear everything?')) {
+        // Handle "Add Miles" form submission
+        document.getElementById('addMilesForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const addTraining = parseFloat(document.getElementById('addTrainingMiles').value) || 0;
+            const addRace = parseFloat(document.getElementById('addRaceMiles').value) || 0;
+
+            if (addTraining === 0 && addRace === 0) {
+                showAddMessage('Please enter miles to add', 'error');
                 return;
             }
 
-            tracker.setMiles(0, 0);
-            tracker.setAdditionalDonations(0);
+            const addBtn = document.getElementById('addMilesBtn');
+            const originalText = addBtn.innerHTML;
+            addBtn.innerHTML = '<span class="spinner"></span> Adding...';
+            addBtn.disabled = true;
+
+            // Calculate new totals
+            const newTraining = tracker.data.trainingMiles + addTraining;
+            const newRace = tracker.data.raceMiles + addRace;
+
+            tracker.setMiles(newTraining, newRace);
             
             const result = await tracker.saveData(currentPin);
 
+            addBtn.innerHTML = originalText;
+            addBtn.disabled = false;
+
             if (result.success) {
-                showMessage('✓ All data has been cleared!', 'success');
+                showAddMessage(`✓ Added ${(addTraining + addRace).toFixed(1)} miles!`, 'success');
+                document.getElementById('addTrainingMiles').value = 0;
+                document.getElementById('addRaceMiles').value = 0;
                 await loadCurrentData();
             } else {
-                showMessage('Error: ' + (result.error || 'Failed to clear data'), 'error');
+                showAddMessage('Error: ' + (result.error || 'Failed to add miles'), 'error');
             }
+        });
+
+        function showAddMessage(text, type) {
+            const messageEl = document.getElementById('addMessage');
+            messageEl.textContent = text;
+            messageEl.classList.remove('success', 'error');
+            messageEl.classList.add(type);
         }
 
         function showMessage(text, type) {
@@ -530,13 +587,14 @@
         async function restoreFromBackup() {
             const backupKey = document.getElementById('backupSelect').value;
             if (!backupKey) {
-                showRestoreMessage('Please select a backup', 'error');
+                showRestoreMessage('Please select a backup to restore', 'error');
                 return;
             }
-
-            if (!confirm(`Restore backup from ${backupKey.replace('backup_', '')}?\n\nThis will replace current data.`)) {
-                return;
-            }
+            
+            const restoreBtn = document.getElementById('restoreBtn');
+            const originalText = restoreBtn.innerHTML;
+            restoreBtn.innerHTML = '<span class="spinner"></span> Restoring...';
+            restoreBtn.disabled = true;
 
             try {
                 const response = await fetch('https://milesformeals2026.gabe-corsini.workers.dev/api/restore', {
@@ -559,15 +617,19 @@
             } catch (error) {
                 console.error('Restore error:', error);
                 showRestoreMessage('Error: ' + error.message, 'error');
-            }
-        }
+                        } finally {
+                            restoreBtn.innerHTML = originalText;
+                            restoreBtn.disabled = false;
+                        }
+                    }
+            
+                    function showRestoreMessage(text, type) {
+                        const messageEl = document.getElementById('restoreMessage');
+                        messageEl.textContent = text;
+                        messageEl.classList.remove('success', 'error');
+                        messageEl.classList.add(type);
+                    }
+                </script>
+            </body>
+            </html>
 
-        function showRestoreMessage(text, type) {
-            const messageEl = document.getElementById('restoreMessage');
-            messageEl.textContent = text;
-            messageEl.classList.remove('success', 'error');
-            messageEl.classList.add(type);
-        }
-    </script>
-</body>
-</html>
