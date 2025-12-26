@@ -27,6 +27,7 @@ export default {
             trainingMiles: 0,
             raceMiles: 0,
             additionalDonations: 0,
+            targetMiles: 1000,
             lastUpdated: new Date().toISOString()
           }), { headers: corsHeaders });
         }
@@ -57,8 +58,9 @@ export default {
         const trainingMiles = parseFloat(body.trainingMiles) || 0;
         const raceMiles = parseFloat(body.raceMiles) || 0;
         const additionalDonations = parseFloat(body.additionalDonations) || 0;
+        const targetMiles = Math.max(parseFloat(body.targetMiles) || 0, 0);
 
-        if (trainingMiles < 0 || raceMiles < 0 || additionalDonations < 0) {
+        if (trainingMiles < 0 || raceMiles < 0 || additionalDonations < 0 || targetMiles < 0) {
           return new Response(JSON.stringify({ error: 'Values cannot be negative' }), {
             status: 400,
             headers: corsHeaders
@@ -70,6 +72,7 @@ export default {
           trainingMiles,
           raceMiles,
           additionalDonations,
+          targetMiles,
           lastUpdated: new Date().toISOString()
         };
 

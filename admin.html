@@ -308,6 +308,7 @@
             <p><strong>Current Training Miles:</strong> <span id="currentTraining">0</span></p>
             <p><strong>Current Race Miles:</strong> <span id="currentRace">0</span></p>
             <p><strong>Total Miles:</strong> <span id="currentTotal">0</span></p>
+            <p><strong>Target Miles:</strong> <span id="currentTarget">1,000</span></p>
             <p><strong>Total Raised:</strong> <span id="currentRaised">$0</span></p>
         </div>
 
@@ -325,6 +326,11 @@
             <div class="form-group">
                 <label for="additionalDonations">Additional Donations ($):</label>
                 <input type="number" id="additionalDonations" step="0.01" min="0" value="0" required>
+            </div>
+
+            <div class="form-group">
+                <label for="targetMiles">Target Miles Goal:</label>
+                <input type="number" id="targetMiles" step="1" min="0" value="1000" required>
             </div>
 
             <div class="button-group">
@@ -389,6 +395,7 @@
             document.getElementById('currentTraining').textContent = tracker.data.trainingMiles.toFixed(1);
             document.getElementById('currentRace').textContent = tracker.data.raceMiles.toFixed(1);
             document.getElementById('currentTotal').textContent = tracker.getTotalMiles().toFixed(1);
+            document.getElementById('currentTarget').textContent = (tracker.data.targetMiles || 1000).toLocaleString();
             document.getElementById('currentRaised').textContent = '$' + tracker.getTotalDonations().toFixed(2);
             document.getElementById('currentUpdated').textContent = formatLastUpdated(tracker.data.lastUpdated);
 
@@ -396,6 +403,7 @@
             document.getElementById('trainingMiles').value = tracker.data.trainingMiles;
             document.getElementById('raceMiles').value = tracker.data.raceMiles;
             document.getElementById('additionalDonations').value = tracker.data.additionalDonations;
+            document.getElementById('targetMiles').value = tracker.data.targetMiles || 1000;
         }
 
         // Handle form submission
@@ -405,9 +413,10 @@
             const trainingMiles = parseFloat(document.getElementById('trainingMiles').value);
             const raceMiles = parseFloat(document.getElementById('raceMiles').value);
             const additionalDonations = parseFloat(document.getElementById('additionalDonations').value);
+            const targetMiles = parseFloat(document.getElementById('targetMiles').value);
 
             // Validate input
-            if (isNaN(trainingMiles) || isNaN(raceMiles) || isNaN(additionalDonations)) {
+            if (isNaN(trainingMiles) || isNaN(raceMiles) || isNaN(additionalDonations) || isNaN(targetMiles)) {
                 showMessage('Please enter valid numbers', 'error');
                 return;
             }
@@ -419,6 +428,7 @@
 
             tracker.setMiles(trainingMiles, raceMiles);
             tracker.setAdditionalDonations(additionalDonations);
+            tracker.setTargetMiles(targetMiles);
             
             const result = await tracker.saveData(currentPin);
 

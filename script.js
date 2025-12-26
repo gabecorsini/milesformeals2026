@@ -7,6 +7,7 @@ class MilesTracker {
             trainingMiles: 0,
             raceMiles: 0,
             additionalDonations: 0,
+            targetMiles: 1000,
             lastUpdated: null
         };
         this.isLoading = false;
@@ -23,6 +24,7 @@ class MilesTracker {
                 trainingMiles: parseFloat(data.trainingMiles) || 0,
                 raceMiles: parseFloat(data.raceMiles) || 0,
                 additionalDonations: parseFloat(data.additionalDonations) || 0,
+                targetMiles: parseFloat(data.targetMiles) || 1000,
                 lastUpdated: data.lastUpdated || new Date().toISOString()
             };
             
@@ -50,7 +52,8 @@ class MilesTracker {
                     pin: pin,
                     trainingMiles: this.data.trainingMiles,
                     raceMiles: this.data.raceMiles,
-                    additionalDonations: this.data.additionalDonations
+                    additionalDonations: this.data.additionalDonations,
+                    targetMiles: this.data.targetMiles
                 })
             });
 
@@ -88,6 +91,10 @@ class MilesTracker {
         this.data.additionalDonations = parseFloat(amount) || 0;
     }
 
+    setTargetMiles(amount) {
+        this.data.targetMiles = Math.max(parseFloat(amount) || 0, 0);
+    }
+
     updateDisplay() {
         const totalMiles = this.getTotalMiles();
         const totalDonations = this.getTotalDonations();
@@ -107,10 +114,15 @@ class MilesTracker {
 
         // Update progress bar
         if (progressFillEl && progressPercentEl) {
-            const targetMiles = 1200;
-            const progressPercent = Math.min((totalMiles / targetMiles) * 100, 100);
+            const targetMiles = this.data.targetMiles || 1000;
+            const progressPercent = targetMiles > 0 ? Math.min((totalMiles / targetMiles) * 100, 100) : 0;
             progressFillEl.style.width = progressPercent + '%';
             progressPercentEl.textContent = Math.round(progressPercent) + '%';
+
+            const progressLabelEl = document.getElementById('progressTargetLabel');
+            if (progressLabelEl) {
+                progressLabelEl.textContent = targetMiles.toLocaleString();
+            }
         }
     }
 }
