@@ -383,8 +383,6 @@
 
     <script src="script.js"></script>
     <script>
-        // Set your PIN here - must match the secret set in Cloudflare Worker
-        const ADMIN_PIN = '2026';
         let currentPin = null;
 
         // Wait for tracker to be initialized
@@ -400,19 +398,55 @@
             const pinInput = document.getElementById('pinInput').value;
             const pinError = document.getElementById('pinError');
 
-            if (pinInput === ADMIN_PIN) {
+            // Try to verify the PIN by making a test API call to the worker
+            fetch('https://miles-for-meals.deno.dev/api/miles', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    pin: pinInput,
+                    trainingMiles: 0,
+                    raceMiles: 0,
+                    additionalDonations: 0,
+                    targetMiles: 1000
+                })
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    // Invalid PIN
+                    pinError.style.display = 'block';
+                    document.getElementById('pinInput').value = '';
+                    document.getElementById('pinInput').focus();
+                    setTimeout(() => {
+                        pinError.style.display = 'none';
+                    }, 3000);
+                    return Promise.reject('Invalid PIN');
+                } else if (response.ok || response.status === 200) {
+                    // Valid PIN
+                    return response.json();
+                } else {
+                    throw new Error('Unexpected response');
+                }
+            })
+            .then(data => {
+                // PIN is valid
                 currentPin = pinInput;
                 document.getElementById('pinContainer').style.display = 'none';
                 document.getElementById('adminContainer').classList.add('unlocked');
                 waitForTracker(loadCurrentData);
-            } else {
-                pinError.style.display = 'block';
-                document.getElementById('pinInput').value = '';
-                document.getElementById('pinInput').focus();
-                setTimeout(() => {
-                    pinError.style.display = 'none';
-                }, 3000);
-            }
+            })
+            .catch(error => {
+                // Only show error if it's not from the reject above
+                if (error !== 'Invalid PIN') {
+                    console.error('PIN verification error:', error);
+                    pinError.textContent = 'Error connecting to server';
+                    pinError.style.display = 'block';
+                    setTimeout(() => {
+                        pinError.style.display = 'none';
+                    }, 3000);
+                }
+            });
         }
 
         // Allow Enter key to submit PIN
