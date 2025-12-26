@@ -65,17 +65,26 @@ class MilesTracker {
         const totalMiles = this.getTotalMiles();
         const totalDonations = this.getTotalDonations();
 
-        // Update tracker values
-        document.getElementById('totalMiles').textContent = totalMiles.toFixed(1);
-        document.getElementById('trainingMiles').textContent = this.data.trainingMiles.toFixed(1);
-        document.getElementById('raceMiles').textContent = this.data.raceMiles.toFixed(1);
-        document.getElementById('totalDonations').textContent = '$' + totalDonations.toFixed(2);
+        // Update tracker values (only if elements exist on this page)
+        const totalMilesEl = document.getElementById('totalMiles');
+        const trainingMilesEl = document.getElementById('trainingMiles');
+        const raceMilesEl = document.getElementById('raceMiles');
+        const totalDonationsEl = document.getElementById('totalDonations');
+        const progressFillEl = document.getElementById('progressFill');
+        const progressPercentEl = document.getElementById('progressPercent');
+
+        if (totalMilesEl) totalMilesEl.textContent = totalMiles.toFixed(1);
+        if (trainingMilesEl) trainingMilesEl.textContent = this.data.trainingMiles.toFixed(1);
+        if (raceMilesEl) raceMilesEl.textContent = this.data.raceMiles.toFixed(1);
+        if (totalDonationsEl) totalDonationsEl.textContent = '$' + totalDonations.toFixed(2);
 
         // Update progress bar
-        const targetMiles = 1200;
-        const progressPercent = Math.min((totalMiles / targetMiles) * 100, 100);
-        document.getElementById('progressFill').style.width = progressPercent + '%';
-        document.getElementById('progressPercent').textContent = Math.round(progressPercent) + '%';
+        if (progressFillEl && progressPercentEl) {
+            const targetMiles = 1200;
+            const progressPercent = Math.min((totalMiles / targetMiles) * 100, 100);
+            progressFillEl.style.width = progressPercent + '%';
+            progressPercentEl.textContent = Math.round(progressPercent) + '%';
+        }
     }
 }
 
