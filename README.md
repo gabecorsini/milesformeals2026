@@ -1,102 +1,33 @@
-# Miles for Meals 2026 - Project Documentation
+# Miles for Meals 2026
 
-## Overview
-Miles for Meals 2026 is a single-page charitable running event website that tracks Missy Watson's running miles throughout 2026 and converts them into donations to the local food bank.
+Charity fundraising site for Missy Watson's 2026 running challenge. Tracks miles run and auto-calculates donations ($1 per training mile, $2 per race mile) to the local food bank.
 
-## Project Structure
+## Quick Start
 
-```
-miles-for-meals-2026/
-├── index.html           # Main public website
-├── admin.html           # Admin panel for updating miles data
-├── styles.css           # Responsive styling for the entire site
-├── script.js            # Data management and interactivity
-├── data.json            # (Optional) Future API data storage
-└── README.md            # This file
-```
+**Public Site**: `index.html` - View progress, miles, and donations
+**Admin**: `admin.html` - PIN 2026 to update miles, donations, and target
 
 ## Features
 
-### 🌟 Main Website (index.html)
-- **Header**: Prominent branding with gradient background
-- **Navigation**: Sticky navigation bar for easy section access
-- **About Section**: Event description and donation model explanation
-  - $1 per training mile
-  - $2 per race mile
-- **Tracker Section**: Real-time statistics display
-  - Total miles counter
-  - Training miles counter
-  - Race miles counter
-  - Total donations raised (highlighted)
-  - Progress bar toward 1,200 mile goal
-- **Contact Section**: Multiple ways to get involved
-  - Email contact
-  - Venmo integration link
-  - Social media links
-- **Footer**: Additional resources and social links
+- **Live Tracker**: Shows training miles, race miles, total donations
+- **Dynamic Target**: Edit your goal anytime from admin
+- **Quick Add**: Easily increment miles or donations without replacing values
+- **Auto Backups**: Daily snapshots stored in KV, restore anytime
+- **Mobile Friendly**: Fully responsive design
 
-### 🔧 Admin Panel (admin.html)
-- Easy data entry form for updating miles
-- Displays current data
-- Validation and confirmation dialogs
-- Success/error messaging
-- Reset functionality (with confirmation)
+## Tech Stack
 
-### 💾 Data Management (script.js)
-- **MilesTracker Class**: Manages all data operations
-  - Stores data in browser's localStorage (no backend needed)
-  - Calculates donations automatically
-  - Updates display in real-time
-- **Smooth Navigation**: Animated scrolling between sections
-- **Persistent Storage**: Data persists across browser sessions
+- HTML/CSS/JavaScript frontend
+- Cloudflare Worker + KV backend
+- Automatic daily backups with 7-day retention
 
-### 🎨 Responsive Design (styles.css)
-- Mobile-first approach
-- Fully responsive from 320px to 4K displays
-- Smooth transitions and hover effects
-- Accessible color contrast
-- Running/charity themed color palette
+## Admin Features
 
-## Color Palette
-- **Primary Blue**: #2563eb - Main brand color
-- **Charity Red**: #dc2626 - Accent for impact
-- **Warm Orange**: #f59e0b - Accent for engagement
-- **Success Green**: #10b981 - Progress indicator
-- **Dark Background**: #0f172a - Depth
-- **Light Background**: #f8fafc - Clean, readable
-
-## How to Use
-
-### For the Public (index.html)
-1. Visit the website to see Missy's current progress
-2. View the miles counter and donation total
-3. Use contact buttons to reach out via email, Venmo, or social media
-4. Check the progress bar to see how close to the 1,200 mile goal
-
-### For Missy (admin.html)
-1. Navigate to `admin.html`
-2. Enter the current training miles and race miles
-3. Enter any additional donations received
-4. Click "Update Data"
-5. The main website automatically reflects these changes
-
-## Data Storage
-
-The site uses **localStorage** for data persistence:
-- No backend server required
-- Data stored locally on the device
-- Data persists across browser sessions
-- Can be reset with confirmation
-
-### Data Structure
-```javascript
-{
-  trainingMiles: 0,      // Total training miles
-  raceMiles: 0,          // Total race miles
-  additionalDonations: 0, // Extra donations
-  lastUpdated: "ISO timestamp"
-}
-```
+From the PIN-protected admin panel:
+- Update target miles goal
+- Quick add training miles
+- Quick add donations
+- Restore from automatic daily backups
 
 ## Deployment
 
