@@ -136,6 +136,27 @@
             transition: all 0.3s;
         }
 
+        .btn-update:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         .btn-update {
             background-color: #2563eb;
             color: white;
@@ -269,7 +290,7 @@
 
         <div class="info-box">
             <strong>Admin Panel:</strong> Use this page to update Missy's running data. 
-            This data is stored locally on this device.
+            This data is stored in the cloud and visible to everyone visiting the site.
         </div>
 
         <div class="current-data">
@@ -296,7 +317,7 @@
             </div>
 
             <div class="button-group">
-                <button type="submit" class="btn-update">Update Data</button>
+                <button type="submit" class="btn-update" id="updateBtn">Update Data</button>
                 <button type="button" class="btn-danger" onclick="clearAllData()">⚠️ Clear All Data</button>
             </div>
 
@@ -306,49 +327,67 @@
 
     <script src="script.js"></script>
     <script>
-        // Set your PIN here - change this to whatever you want
+        // Set your PIN here - must match the secret set in Cloudflare Worker
         const ADMIN_PIN = '2026';
+        let currentPin = null;
 
-        function verifyPin() {
-            const pinInput = document.getElementById('pinInput').value;
-            const pinError = document.getElementById('pinError');
-
-            if (pinInput === ADMIN_PIN) {
-                document.getElementById('pinContainer').style.display = 'none';
-                document.getElementById('adminContainer').classList.add('unlocked');
-                waitForTracker(loadCurrentData);
-            } else {
-                pinError.style.display = 'block';
-                document.getElementById('pinInput').value = '';
-                setTimeout(() => {
-                    pinError.style.display = 'none';
-                }, 3000);
-            }
-        }
-
-        // Wait for tracker to be initialized before using it
+        // Wait for tracker to be initialized
         function waitForTracker(callback) {
-            if (typeof tracker !== 'undefined' && tracker.data) {
+            if (typeof tracker !== 'undefined' && tracker) {
                 callback();
             } else {
                 setTimeout(() => waitForTracker(callback), 50);
             }
         }
 
-        // Load current data on page load
-        function loadCurrentData() {
+        function verifyPin() {
+            const pinInput = document.getElementById('pinInput').value;
+            const pinError = document.getElementById('pinError');
+
+            if (pinInput === ADMIN_PIN) {
+                currentPin = pinInput;
+                document.getElementById('pinContainer').style.display = 'none';
+                document.getElementById('adminContainer').classList.add('unlocked');
+                waitForTracker(loadCurrentData);
+            } else {
+                pinError.style.display = 'block';
+                document.getElementById('pinInput').value = '';
+                document.getElementById('pinInput').focus();
+                setTimeout(() => {
+                    pinError.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Allow Enter key to submit PIN
+        document.addEventListener('DOMContentLoaded', () => {
+            const pinInput = document.getElementById('pinInput');
+            if (pinInput) {
+                pinInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        verifyPin();
+                    }
+                });
+                pinInput.focus();
+            }
+        });
+
+        async function loadCurrentData() {
+            await tracker.loadData();
+            
             document.getElementById('currentTraining').textContent = tracker.data.trainingMiles.toFixed(1);
             document.getElementById('currentRace').textContent = tracker.data.raceMiles.toFixed(1);
             document.getElementById('currentTotal').textContent = tracker.getTotalMiles().toFixed(1);
             document.getElementById('currentRaised').textContent = '$' + tracker.getTotalDonations().toFixed(2);
 
+            // Pre-fill form with current values
             document.getElementById('trainingMiles').value = tracker.data.trainingMiles;
             document.getElementById('raceMiles').value = tracker.data.raceMiles;
             document.getElementById('additionalDonations').value = tracker.data.additionalDonations;
         }
 
         // Handle form submission
-        document.getElementById('milesForm').addEventListener('submit', function(e) {
+        document.getElementById('milesForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const trainingMiles = parseFloat(document.getElementById('trainingMiles').value);
@@ -361,32 +400,46 @@
                 return;
             }
 
+            const updateBtn = document.getElementById('updateBtn');
+            const originalText = updateBtn.innerHTML;
+            updateBtn.innerHTML = '<span class="spinner"></span> Updating...';
+            updateBtn.disabled = true;
+
             tracker.setMiles(trainingMiles, raceMiles);
-            tracker.data.additionalDonations = additionalDonations;
-            tracker.saveData();
+            tracker.setAdditionalDonations(additionalDonations);
+            
+            const result = await tracker.saveData(currentPin);
 
-            loadCurrentData();
-            showMessage('✓ Data updated successfully!', 'success');
+            updateBtn.innerHTML = originalText;
+            updateBtn.disabled = false;
 
-            setTimeout(() => {
-                document.getElementById('message').classList.remove('success', 'error');
-            }, 3000);
+            if (result.success) {
+                showMessage('✓ Data updated successfully!', 'success');
+                await loadCurrentData();
+            } else {
+                showMessage('Error: ' + (result.error || 'Failed to update data'), 'error');
+            }
         });
 
-        function clearAllData() {
-            if (confirm('⚠️ WARNING: This will permanently clear all miles and donations data!\n\nAre you sure?')) {
-                if (confirm('This action cannot be undone. Clear everything?')) {
-                    tracker.data.trainingMiles = 0;
-                    tracker.data.raceMiles = 0;
-                    tracker.data.additionalDonations = 0;
-                    tracker.saveData();
-                    loadCurrentData();
-                    showMessage('✓ All data has been cleared!', 'success');
+        async function clearAllData() {
+            if (!confirm('⚠️ WARNING: This will permanently clear all miles and donations data!\n\nAre you sure?')) {
+                return;
+            }
+            
+            if (!confirm('This action cannot be undone. Clear everything?')) {
+                return;
+            }
 
-                    setTimeout(() => {
-                        document.getElementById('message').classList.remove('success', 'error');
-                    }, 3000);
-                }
+            tracker.setMiles(0, 0);
+            tracker.setAdditionalDonations(0);
+            
+            const result = await tracker.saveData(currentPin);
+
+            if (result.success) {
+                showMessage('✓ All data has been cleared!', 'success');
+                await loadCurrentData();
+            } else {
+                showMessage('Error: ' + (result.error || 'Failed to clear data'), 'error');
             }
         }
 
