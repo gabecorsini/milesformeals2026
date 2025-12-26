@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miles for Meals 2026</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="header-title">Miles for Meals</h1>
+            <p class="header-subtitle">2026 Charity Running Event</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="#about" class="nav-link">About</a></li>
+            <li><a href="#tracker" class="nav-link">Tracker</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- About Section -->
+        <section id="about" class="section about-section">
+            <div class="container">
+                <h2 class="section-title">About Miles for Meals</h2>
+                <div class="about-content">
+                    <p class="about-text">
+                        Join us in supporting our local food bank through the power of running! 
+                        Miles for Meals 2026 follows <strong>Missy Watson</strong> as she runs 
+                        throughout the year, turning every mile into a donation.
+                    </p>
+                    <div class="donation-model">
+                        <h3>How It Works</h3>
+                        <div class="model-items">
+                            <div class="model-item">
+                                <span class="model-icon">🏃</span>
+                                <p><strong>Training Miles:</strong> $1 per mile</p>
+                            </div>
+                            <div class="model-item">
+                                <span class="model-icon">🏁</span>
+                                <p><strong>Race Miles:</strong> $2 per mile</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="about-text-secondary">
+                        In 2025, this model raised approximately <strong>$1,200</strong> for our local food bank. 
+                        Help us surpass that goal in 2026!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Miles Tracker Section -->
+        <section id="tracker" class="section tracker-section">
+            <div class="container">
+                <h2 class="section-title">2026 Progress</h2>
+                <div class="tracker-grid">
+                    <div class="tracker-card">
+                        <div class="tracker-stat">
+                            <h3 class="tracker-label">Total Miles</h3>
+                            <p class="tracker-value" id="totalMiles">0</p>
+                        </div>
+                    </div>
+                    <div class="tracker-card">
+                        <div class="tracker-stat">
+                            <h3 class="tracker-label">Training Miles</h3>
+                            <p class="tracker-value" id="trainingMiles">0</p>
+                        </div>
+                    </div>
+                    <div class="tracker-card">
+                        <div class="tracker-stat">
+                            <h3 class="tracker-label">Race Miles</h3>
+                            <p class="tracker-value" id="raceMiles">0</p>
+                        </div>
+                    </div>
+                    <div class="tracker-card tracker-card-primary">
+                        <div class="tracker-stat">
+                            <h3 class="tracker-label">Total Raised</h3>
+                            <p class="tracker-value" id="totalDonations">$0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <p class="progress-label">Progress towards 1,200 miles:</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-percent" id="progressPercent">0%</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section contact-section">
+            <div class="container">
+                <h2 class="section-title">Get Involved</h2>
+                <div class="contact-content">
+                    <p class="contact-intro">
+                        Want to support Missy's journey? Reach out to make an additional donation 
+                        or to learn more about the event!
+                    </p>
+                    <div class="contact-methods">
+                        <a href="mailto:contact@example.com" class="contact-button email-button">
+                            <span>📧</span> Email
+                        </a>
+                        <a href="https://venmo.com" target="_blank" class="contact-button venmo-button">
+                            <span>💳</span> Venmo
+                        </a>
+                        <a href="https://www.instagram.com" target="_blank" class="contact-button social-button">
+                            <span>📱</span> Instagram
+                        </a>
+                    </div>
+                    <p class="contact-note">
+                        <small>Donations support the local food bank. Thank you for your generosity!</small>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Miles for Meals. All proceeds go to the local food bank.</p>
+            <p class="footer-links">
+                <a href="https://www.instagram.com" target="_blank">Instagram</a> • 
+                <a href="https://www.facebook.com" target="_blank">Facebook</a> • 
+                <a href="mailto:contact@example.com">Contact</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

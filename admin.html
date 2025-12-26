@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miles for Meals - Admin Panel</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-title {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .button-group button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-update {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-update:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-reset {
+            background-color: #64748b;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background-color: #475569;
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .btn-back {
+            background-color: #10b981;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-back:hover {
+            background-color: #059669;
+        }
+
+        .back-button {
+            margin-bottom: 1rem;
+        }
+
+        .info-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #166534;
+        }
+
+        .message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .message.success {
+            background-color: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+
+        .message.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            display: block;
+        }
+
+        .current-data {
+            background-color: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .current-data p {
+            margin: 0.5rem 0;
+            color: #64748b;
+        }
+
+        .current-data strong {
+            color: #2563eb;
+        }
+
+        @media (max-width: 480px) {
+            .admin-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="back-button">
+            <a href="index.html" class="btn-back">← Back to Site</a>
+        </div>
+
+        <h1 class="admin-title">⚙️ Update Miles Data</h1>
+
+        <div class="info-box">
+            <strong>Admin Panel:</strong> Use this page to update Missy's running data. 
+            This data is stored locally on this device.
+        </div>
+
+        <div class="current-data">
+            <p><strong>Current Training Miles:</strong> <span id="currentTraining">0</span></p>
+            <p><strong>Current Race Miles:</strong> <span id="currentRace">0</span></p>
+            <p><strong>Total Miles:</strong> <span id="currentTotal">0</span></p>
+            <p><strong>Total Raised:</strong> <span id="currentRaised">$0</span></p>
+        </div>
+
+        <form id="milesForm">
+            <div class="form-group">
+                <label for="trainingMiles">Training Miles:</label>
+                <input type="number" id="trainingMiles" step="0.1" min="0" value="0" required>
+            </div>
+
+            <div class="form-group">
+                <label for="raceMiles">Race Miles:</label>
+                <input type="number" id="raceMiles" step="0.1" min="0" value="0" required>
+            </div>
+
+            <div class="form-group">
+                <label for="additionalDonations">Additional Donations ($):</label>
+                <input type="number" id="additionalDonations" step="0.01" min="0" value="0" required>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-update">Update Data</button>
+                <button type="button" class="btn-danger" onclick="clearAllData()">⚠️ Clear All Data</button>
+            </div>
+
+            <div id="message" class="message"></div>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Load current data on page load
+        function loadCurrentData() {
+            document.getElementById('currentTraining').textContent = tracker.data.trainingMiles.toFixed(1);
+            document.getElementById('currentRace').textContent = tracker.data.raceMiles.toFixed(1);
+            document.getElementById('currentTotal').textContent = tracker.getTotalMiles().toFixed(1);
+            document.getElementById('currentRaised').textContent = '$' + tracker.getTotalDonations().toFixed(2);
+
+            document.getElementById('trainingMiles').value = tracker.data.trainingMiles;
+            document.getElementById('raceMiles').value = tracker.data.raceMiles;
+            document.getElementById('additionalDonations').value = tracker.data.additionalDonations;
+        }
+
+        // Handle form submission
+        document.getElementById('milesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const trainingMiles = parseFloat(document.getElementById('trainingMiles').value);
+            const raceMiles = parseFloat(document.getElementById('raceMiles').value);
+            const additionalDonations = parseFloat(document.getElementById('additionalDonations').value);
+
+            // Validate input
+            if (isNaN(trainingMiles) || isNaN(raceMiles) || isNaN(additionalDonations)) {
+                showMessage('Please enter valid numbers', 'error');
+                return;
+            }
+
+            tracker.setMiles(trainingMiles, raceMiles);
+            tracker.data.additionalDonations = additionalDonations;
+            tracker.saveData();
+
+            loadCurrentData();
+            showMessage('✓ Data updated successfully!', 'success');
+
+            setTimeout(() => {
+                document.getElementById('message').classList.remove('success', 'error');
+            }, 3000);
+        });
+
+        function resetData() {
+            if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+                tracker.data.trainingMiles = 0;
+                tracker.data.raceMiles = 0;
+                tracker.data.additionalDonations = 0;
+                tracker.saveData();
+                loadCurrentData();
+                showMessage('✓ Data reset successfully!', 'success');
+
+                setTimeout(() => {
+                    document.getElementById('message').classList.remove('success', 'error');
+                }, 3000);
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ WARNING: This will permanently clear all miles and donations data!\n\nAre you sure?')) {
+                if (confirm('This action cannot be undone. Clear everything?')) {
+                    tracker.data.trainingMiles = 0;
+                    tracker.data.raceMiles = 0;
+                    tracker.data.additionalDonations = 0;
+                    tracker.saveData();
+                    loadCurrentData();
+                    showMessage('✓ All data has been cleared!', 'success');
+
+                    setTimeout(() => {
+                        document.getElementById('message').classList.remove('success', 'error');
+                    }, 3000);
+                }
+            }
+        }
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.classList.remove('success', 'error');
+            messageEl.classList.add(type);
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadCurrentData);
+    </script>
+</body>
+</html>
