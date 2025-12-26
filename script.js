@@ -2,7 +2,7 @@
 class MilesTracker {
     constructor() {
         // TODO: After deploying worker, replace YOUR-SUBDOMAIN with your actual Cloudflare subdomain
-        this.API_URL = 'https://miles-for-meals-api.YOUR-SUBDOMAIN.workers.dev/api/miles';
+        this.API_URL = 'https://milesformeals2026.gabe-corsini.workers.dev/api/miles';
         this.data = {
             trainingMiles: 0,
             raceMiles: 0,
