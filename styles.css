@@ -6,17 +6,17 @@
 }
 
 :root {
-    /* Color Palette - drawn from the logo */
-    --primary-color: #0d3a66;      /* deep navy */
-    --secondary-color: #7d2f8e;    /* plum accent */
-    --accent-color: #1fa65a;       /* heart green */
-    --success-color: #1fa65a;      /* reuse green for success */
-    --dark-bg: #0b1a2c;            /* near-navy */
-    --light-bg: #f6f7fb;           /* soft off-white */
+    /* Color Palette (from logo / Gemini) */
+    --primary-color: #1d3557;      /* deep navy */
+    --secondary-color: #388e3c;    /* forest green */
+    --accent-color: #ffffff;       /* crisp white */
+    --success-color: #388e3c;      /* success uses green */
+    --dark-bg: #0f1b30;            /* deeper navy for text/bg */
+    --light-bg: #f7f9fb;           /* soft off-white */
     --card-bg: #ffffff;
-    --text-dark: #0f172a;
-    --text-light: #475569;
-    --border-color: #e2e8f0;
+    --text-dark: #0f1b30;
+    --text-light: #4a5568;
+    --border-color: #e3e8ef;
     
     /* Spacing */
     --spacing-xs: 0.5rem;
@@ -58,7 +58,7 @@ body {
 
 /* Header */
 .header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 55%, #c92a32 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, #20436b 45%, var(--secondary-color) 100%);
     color: white;
     padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-2xl);
     text-align: center;
