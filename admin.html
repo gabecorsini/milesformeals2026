@@ -224,6 +224,15 @@
 
     <script src="script.js"></script>
     <script>
+        // Wait for tracker to be initialized before using it
+        function waitForTracker(callback) {
+            if (typeof tracker !== 'undefined' && tracker.data) {
+                callback();
+            } else {
+                setTimeout(() => waitForTracker(callback), 50);
+            }
+        }
+
         // Load current data on page load
         function loadCurrentData() {
             document.getElementById('currentTraining').textContent = tracker.data.trainingMiles.toFixed(1);
@@ -262,21 +271,6 @@
             }, 3000);
         });
 
-        function resetData() {
-            if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
-                tracker.data.trainingMiles = 0;
-                tracker.data.raceMiles = 0;
-                tracker.data.additionalDonations = 0;
-                tracker.saveData();
-                loadCurrentData();
-                showMessage('✓ Data reset successfully!', 'success');
-
-                setTimeout(() => {
-                    document.getElementById('message').classList.remove('success', 'error');
-                }, 3000);
-            }
-        }
-
         function clearAllData() {
             if (confirm('⚠️ WARNING: This will permanently clear all miles and donations data!\n\nAre you sure?')) {
                 if (confirm('This action cannot be undone. Clear everything?')) {
@@ -301,8 +295,8 @@
             messageEl.classList.add(type);
         }
 
-        // Load data when page loads
-        document.addEventListener('DOMContentLoaded', loadCurrentData);
+        // Load data when page loads (wait for tracker first)
+        waitForTracker(loadCurrentData);
     </script>
 </body>
 </html>
