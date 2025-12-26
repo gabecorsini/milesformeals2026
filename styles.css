@@ -6,13 +6,13 @@
 }
 
 :root {
-    /* Color Palette - adjust these to match the logo if desired */
-    --primary-color: #2563eb;
-    --secondary-color: #dc2626;
-    --accent-color: #f59e0b;
-    --success-color: #0d9488;
-    --dark-bg: #0f172a;
-    --light-bg: #f8fafc;
+    /* Color Palette - drawn from the logo */
+    --primary-color: #0d3a66;      /* deep navy */
+    --secondary-color: #7d2f8e;    /* plum accent */
+    --accent-color: #1fa65a;       /* heart green */
+    --success-color: #1fa65a;      /* reuse green for success */
+    --dark-bg: #0b1a2c;            /* near-navy */
+    --light-bg: #f6f7fb;           /* soft off-white */
     --card-bg: #ffffff;
     --text-dark: #0f172a;
     --text-light: #475569;
@@ -58,15 +58,15 @@ body {
 
 /* Header */
 .header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 55%, #c92a32 100%);
     color: white;
-    padding: var(--spacing-2xl) var(--spacing-lg);
+    padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-2xl);
     text-align: center;
     box-shadow: var(--shadow-lg);
 }
 
 .header-content {
-    max-width: 900px;
+    max-width: 820px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -77,7 +77,7 @@ body {
 .header-title {
     font-size: var(--font-size-3xl);
     font-weight: 800;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
     letter-spacing: -0.5px;
 }
 
@@ -88,13 +88,16 @@ body {
 }
 
 .logo-wrap {
-    width: 104px;
-    height: 104px;
+    width: 140px;
+    height: 140px;
     border-radius: 999px;
     overflow: hidden;
-    border: 3px solid rgba(255,255,255,0.85);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.16);
-    background: white;
+    border: 3px solid rgba(255,255,255,0.9);
+    box-shadow: 0 18px 40px rgba(13, 58, 102, 0.22);
+    background: var(--card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .logo-circle {
