@@ -6,6 +6,67 @@
     <title>Miles for Meals - Admin Panel</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+        .pin-container {
+            max-width: 400px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .pin-container h2 {
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .pin-container p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .pin-input {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+        }
+
+        .pin-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .pin-button {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pin-button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .pin-error {
+            color: #dc2626;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
         .admin-container {
             max-width: 600px;
             margin: 2rem auto;
@@ -13,6 +74,11 @@
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .admin-container.unlocked {
+            display: block;
         }
 
         .admin-title {
@@ -178,7 +244,23 @@
     </style>
 </head>
 <body>
-    <div class="admin-container">
+    <!-- PIN Protection Screen -->
+    <div class="pin-container" id="pinContainer">
+        <h2>🔐 Admin Access</h2>
+        <p>Enter the PIN to update miles data</p>
+        <input 
+            type="password" 
+            id="pinInput" 
+            class="pin-input" 
+            placeholder="Enter PIN"
+            onkeypress="if(event.key==='Enter') verifyPin()"
+        >
+        <button class="pin-button" onclick="verifyPin()">Unlock</button>
+        <p class="pin-error" id="pinError">❌ Incorrect PIN. Try again.</p>
+    </div>
+
+    <!-- Admin Form (hidden until PIN is entered) -->
+    <div class="admin-container" id="adminContainer">
         <div class="back-button">
             <a href="index.html" class="btn-back">← Back to Site</a>
         </div>
@@ -224,6 +306,26 @@
 
     <script src="script.js"></script>
     <script>
+        // Set your PIN here - change this to whatever you want
+        const ADMIN_PIN = '2026';
+
+        function verifyPin() {
+            const pinInput = document.getElementById('pinInput').value;
+            const pinError = document.getElementById('pinError');
+
+            if (pinInput === ADMIN_PIN) {
+                document.getElementById('pinContainer').style.display = 'none';
+                document.getElementById('adminContainer').classList.add('unlocked');
+                waitForTracker(loadCurrentData);
+            } else {
+                pinError.style.display = 'block';
+                document.getElementById('pinInput').value = '';
+                setTimeout(() => {
+                    pinError.style.display = 'none';
+                }, 3000);
+            }
+        }
+
         // Wait for tracker to be initialized before using it
         function waitForTracker(callback) {
             if (typeof tracker !== 'undefined' && tracker.data) {
@@ -294,9 +396,6 @@
             messageEl.classList.remove('success', 'error');
             messageEl.classList.add(type);
         }
-
-        // Load data when page loads (wait for tracker first)
-        waitForTracker(loadCurrentData);
     </script>
 </body>
 </html>
