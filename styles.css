@@ -6,17 +6,17 @@
 }
 
 :root {
-    /* Color Palette - Running/Charity themed */
-    --primary-color: #2563eb;      /* Vibrant blue */
-    --secondary-color: #dc2626;    /* Charity red */
-    --accent-color: #f59e0b;       /* Warm orange */
-    --success-color: #10b981;      /* Green for progress */
-    --dark-bg: #0f172a;            /* Dark background */
-    --light-bg: #f8fafc;           /* Light background */
-    --card-bg: #ffffff;            /* Card background */
-    --text-dark: #1e293b;          /* Dark text */
-    --text-light: #64748b;         /* Light text */
-    --border-color: #e2e8f0;       /* Border color */
+    /* Color Palette - adjust these to match the logo if desired */
+    --primary-color: #2563eb;
+    --secondary-color: #dc2626;
+    --accent-color: #f59e0b;
+    --success-color: #0d9488;
+    --dark-bg: #0f172a;
+    --light-bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text-dark: #0f172a;
+    --text-light: #475569;
+    --border-color: #e2e8f0;
     
     /* Spacing */
     --spacing-xs: 0.5rem;
@@ -66,8 +66,12 @@ body {
 }
 
 .header-content {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
 }
 
 .header-title {
@@ -81,6 +85,23 @@ body {
     font-size: var(--font-size-lg);
     opacity: 0.95;
     font-weight: 300;
+}
+
+.logo-wrap {
+    width: 104px;
+    height: 104px;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 3px solid rgba(255,255,255,0.85);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.16);
+    background: white;
+}
+
+.logo-circle {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 /* Navigation */
