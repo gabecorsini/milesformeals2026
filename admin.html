@@ -319,39 +319,20 @@
             <p><strong>Total Raised:</strong> <span id="currentRaised">$0</span></p>
         </div>
 
-        <form id="milesForm">
-            <div class="form-group">
-                <label for="trainingMiles">Training Miles:</label>
-                <input type="number" id="trainingMiles" step="0.1" min="0" value="0" required>
-            </div>
-
-            <div class="form-group">
-                <label for="raceMiles">Race Miles:</label>
-                <input type="number" id="raceMiles" step="0.1" min="0" value="0" required>
-            </div>
-
-            <div class="form-group">
-                <label for="additionalDonations">Additional Donations ($):</label>
-                <input type="number" id="additionalDonations" step="0.01" min="0" value="0" required>
-            </div>
-
+        <form id="targetMilesForm" style="margin-bottom: 2rem;">
             <div class="form-group">
                 <label for="targetMiles">Target Miles Goal:</label>
                 <input type="number" id="targetMiles" step="1" min="0" value="1000" required>
             </div>
 
-            <div class="button-group">
-                <button type="submit" class="btn-update" id="updateBtn">Update Data</button>
-                <button type="button" class="btn-danger" onclick="clearAllData()">⚠️ Clear All Data</button>
-            </div>
-
-            <div id="message" class="message"></div>
+            <button type="submit" class="btn-update" id="targetBtn" style="width: 100%; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">Update Target</button>
+            <div id="targetMessage" class="message" style="margin-top: 1rem;"></div>
         </form>
 
         <form id="addMilesForm" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
             <h3 style="color: #1e293b; margin-bottom: 1rem;">➕ Quick Add Miles</h3>
             <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem;">
-                Quickly add miles without editing absolute values. This increments your totals.
+                Quickly add miles without editing absolute values.
             </p>
 
             <div class="form-row">
@@ -367,6 +348,21 @@
 
             <button type="submit" class="btn-update" id="addMilesBtn" style="width: 100%; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">➕ Add Miles</button>
             <div id="addMessage" class="message" style="margin-top: 1rem;"></div>
+        </form>
+
+        <form id="addDonationsForm" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
+            <h3 style="color: #1e293b; margin-bottom: 1rem;">💵 Quick Add Donations</h3>
+            <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem;">
+                Quickly add donations without editing absolute values.
+            </p>
+
+            <div class="form-group">
+                <label for="addDonationAmount">Add Donation ($):</label>
+                <input type="number" id="addDonationAmount" step="0.01" min="0" value="0" required>
+            </div>
+
+            <button type="submit" class="btn-update" id="addDonationsBtn" style="width: 100%; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">💵 Add Donation</button>
+            <div id="donationMessage" class="message" style="margin-top: 1rem;"></div>
         </form>
 
         <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
@@ -450,51 +446,50 @@
             document.getElementById('currentUpdated').textContent = formatLastUpdated(tracker.data.lastUpdated);
 
             // Pre-fill form with current values
-            document.getElementById('trainingMiles').value = tracker.data.trainingMiles;
-            document.getElementById('raceMiles').value = tracker.data.raceMiles;
-            document.getElementById('additionalDonations').value = tracker.data.additionalDonations;
             document.getElementById('targetMiles').value = Number.isFinite(tracker.data.targetMiles) ? tracker.data.targetMiles : 1000;
 
             // Load available backups
             await loadBackups();
         }
 
-        // Handle form submission
-        document.getElementById('milesForm').addEventListener('submit', async function(e) {
+        // Handle Target Miles form submission
+        document.getElementById('targetMilesForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const trainingMiles = parseFloat(document.getElementById('trainingMiles').value);
-            const raceMiles = parseFloat(document.getElementById('raceMiles').value);
-            const additionalDonations = parseFloat(document.getElementById('additionalDonations').value);
             const targetMiles = parseFloat(document.getElementById('targetMiles').value);
 
             // Validate input
-            if (isNaN(trainingMiles) || isNaN(raceMiles) || isNaN(additionalDonations) || isNaN(targetMiles)) {
-                showMessage('Please enter valid numbers', 'error');
+            if (isNaN(targetMiles)) {
+                showTargetMessage('Please enter a valid number', 'error');
                 return;
             }
 
-            const updateBtn = document.getElementById('updateBtn');
-            const originalText = updateBtn.innerHTML;
-            updateBtn.innerHTML = '<span class="spinner"></span> Updating...';
-            updateBtn.disabled = true;
+            const targetBtn = document.getElementById('targetBtn');
+            const originalText = targetBtn.innerHTML;
+            targetBtn.innerHTML = '<span class="spinner"></span> Updating...';
+            targetBtn.disabled = true;
 
-            tracker.setMiles(trainingMiles, raceMiles);
-            tracker.setAdditionalDonations(additionalDonations);
             tracker.setTargetMiles(targetMiles);
             
             const result = await tracker.saveData(currentPin);
 
-            updateBtn.innerHTML = originalText;
-            updateBtn.disabled = false;
+            targetBtn.innerHTML = originalText;
+            targetBtn.disabled = false;
 
             if (result.success) {
-                showMessage('✓ Data updated successfully!', 'success');
+                showTargetMessage('✓ Target updated successfully!', 'success');
                 await loadCurrentData();
             } else {
-                showMessage('Error: ' + (result.error || 'Failed to update data'), 'error');
+                showTargetMessage('Error: ' + (result.error || 'Failed to update target'), 'error');
             }
         });
+
+        function showTargetMessage(text, type) {
+            const messageEl = document.getElementById('targetMessage');
+            messageEl.textContent = text;
+            messageEl.classList.remove('success', 'error');
+            messageEl.classList.add(type);
+        }
 
         // Handle "Add Miles" form submission
         document.getElementById('addMilesForm').addEventListener('submit', async function(e) {
@@ -541,8 +536,43 @@
             messageEl.classList.add(type);
         }
 
-        function showMessage(text, type) {
-            const messageEl = document.getElementById('message');
+        // Handle "Add Donations" form submission
+        document.getElementById('addDonationsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const addAmount = parseFloat(document.getElementById('addDonationAmount').value) || 0;
+
+            if (addAmount === 0) {
+                showDonationMessage('Please enter an amount to add', 'error');
+                return;
+            }
+
+            const addBtn = document.getElementById('addDonationsBtn');
+            const originalText = addBtn.innerHTML;
+            addBtn.innerHTML = '<span class="spinner"></span> Adding...';
+            addBtn.disabled = true;
+
+            // Calculate new total
+            const newDonations = tracker.data.additionalDonations + addAmount;
+
+            tracker.setAdditionalDonations(newDonations);
+            
+            const result = await tracker.saveData(currentPin);
+
+            addBtn.innerHTML = originalText;
+            addBtn.disabled = false;
+
+            if (result.success) {
+                showDonationMessage(`✓ Added $${addAmount.toFixed(2)}!`, 'success');
+                document.getElementById('addDonationAmount').value = 0;
+                await loadCurrentData();
+            } else {
+                showDonationMessage('Error: ' + (result.error || 'Failed to add donation'), 'error');
+            }
+        });
+
+        function showDonationMessage(text, type) {
+            const messageEl = document.getElementById('donationMessage');
             messageEl.textContent = text;
             messageEl.classList.remove('success', 'error');
             messageEl.classList.add(type);
